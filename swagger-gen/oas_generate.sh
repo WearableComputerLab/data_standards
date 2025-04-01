@@ -10,7 +10,7 @@ set -o errexit #abort if any command fails
 #location of swagger codegen install
 SWAGGER_CODEGEN=$HOME/swagger-codegen
 #Location of openapi codegen install
-OAS_CODEGEN=$HOME/openapi-codegen
+OAS_CODEGEN=/root/openapi-codegen
 
 #location of generated output
 SWAGGER_CODEGEN_OUTPUT=/tmp/cds_swagger_gen

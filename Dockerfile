@@ -1,4 +1,4 @@
-FROM nginx
+FROM ruby:2.6.3
 
 ENV RUBY_MAJOR 2.6
 ENV RUBY_VERSION 2.6.3
@@ -74,7 +74,7 @@ WORKDIR /opt/standards
 COPY slate /opt/standards
 
 # Upgrade bundler
-RUN gem install bundler
+RUN gem install bundler -v 2.4.22
 
 # Figure out requirements
 RUN bundle install
@@ -85,19 +85,24 @@ RUN apt-get update
 RUN mkdir -p /usr/share/man/man1
 RUN apt-get install -y --no-install-recommends default-jre-headless npm
 
-RUN mkdir ~/swagger-codegen ~/openapi-codegen
+RUN mkdir -p /root/swagger-codegen /root/openapi-codegen
 
-RUN wget --no-check-certificate https://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.7/swagger-codegen-cli-2.4.7.jar -O ~/swagger-codegen/swagger-codegen-cli.jar
-RUN wget --no-check-certificate https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/3.3.4/openapi-generator-cli-3.3.4.jar -O ~/openapi-codegen/openapi-generator-cli.jar
+RUN wget --no-check-certificate https://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.7/swagger-codegen-cli-2.4.7.jar \
+    -O /root/swagger-codegen/swagger-codegen-cli.jar
+
+RUN wget --no-check-certificate https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar \
+    -O /root/openapi-codegen/openapi-generator-cli-6.6.0.jar
 
 COPY swagger-gen/ swagger-gen/
 COPY slate/ slate/
 COPY docs/ docs/
+ENV OAS_CODEGEN=/root/openapi-codegen
 COPY build.sh /opt/standards
 
 RUN npm install --prefix ./swagger-gen/widdershins-cdr
 
-RUN ./build.sh
+RUN chmod +x /opt/standards/build.sh
+RUN bash -x /opt/standards/build.sh
 
 # Build standards static output
 # RUN bundle exec middleman build --clean
